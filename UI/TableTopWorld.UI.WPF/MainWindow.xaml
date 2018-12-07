@@ -1,0 +1,255 @@
+﻿<Window x:Class="TableTopWorld.UI.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TableTopWorld.UI.WPF"
+        xmlns:TTWEF="clr-namespace:TableTopWorld.Core.EntityFramework;assembly=TableTopWorld.Core.EntityFramework"
+        xmlns:VC="clr-namespace:TableTopWorld.UI.WPF.ValueConverters"
+        mc:Ignorable="d"
+        Title="MainWindow" 
+        x:Name="win_Main"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized">
+    <Window.Resources>
+        <VC:VC_ValueOperation x:Key="VC_MathOp"/>
+        <VC:VC_NamespaceValueConverter x:Key="VC_Namespace"/>
+        <Style x:Key="STY_BasicControl"
+               TargetType="Control">
+            <Setter Property="Margin"
+                    Value="5"/>
+        </Style>
+        <Style x:Key="STY_NormalImageBtn"
+               TargetType="Button" 
+               BasedOn="{StaticResource STY_BasicControl}">
+            <Setter Property="MinWidth"
+                    Value="30"/>
+            <Setter Property="MinHeight"
+                    Value="30"/>
+        </Style>
+        <Style x:Key="STY_RemoveBtn"
+               TargetType="Button" 
+               BasedOn="{StaticResource STY_NormalImageBtn}">
+            <Setter Property="Content"
+                    Value="-"/>
+        </Style>
+        <Style x:Key="STY_AddBtn"
+               TargetType="Button"
+               BasedOn="{StaticResource STY_NormalImageBtn}">
+            <Setter Property="Content"
+                    Value="+"/>
+        </Style>
+        <Style x:Key="STY_GridSplitter"
+               TargetType="GridSplitter"
+               BasedOn="{StaticResource STY_BasicControl}">
+            <Setter Property="Width" 
+                    Value="5"/>
+            <Setter Property="Margin"
+                    Value="0,5,-2.5,5"/>
+            <Setter Property="Background"
+                    Value="Gray"/>
+            <Setter Property="VerticalContentAlignment"
+                    Value="Stretch"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <!--#region col 1 container-->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Stretch"
+                    Grid.Row="0"
+                    Grid.Column="0">
+            <Label Content="Container"
+                   Style="{StaticResource STY_BasicControl}"
+                   HorizontalAlignment="Stretch"/>
+            <Button Style="{StaticResource STY_AddBtn}"
+                    Click="btn_AddContainer_Clicked"
+                    HorizontalAlignment="Right"
+                    Margin="5"/>
+            <Button Style="{StaticResource STY_RemoveBtn}"
+                    Click="btn_RemoveContainer_Clicked"
+                    HorizontalAlignment="Right"
+                    Margin="5"/>
+        </StackPanel>
+        <ListView x:Name="lstVw_Container"
+                  SelectionChanged="lstVw_Container_SelectionChanged"
+                  SelectionMode="Extended"
+                  ItemsSource="{Binding ElementName=win_Main, 
+                                        Path=Containers}"
+                  Style="{StaticResource STY_BasicControl}"
+                  Grid.Row="1"
+                  Grid.Column="0">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Namespace" 
+                                    x:Name="gvc_ContainerNamespace" 
+                                    Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <ComboBox Text="{Binding Path=Namespace,
+                                                             Converter={StaticResource VC_Namespace} }"
+                                              ItemsSource="{Binding Source={x:Static TTWEF:Namespace.RegistredNamespaces}}"
+                                              IsEditable="True"
+                                              Width="{Binding ElementName=gvc_ContainerNamespace, 
+                                                              Path=ActualWidth, 
+                                                              Converter={StaticResource VC_MathOp}, 
+                                                              ConverterParameter=-15}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Name" 
+                                    x:Name="gvc_ContainerName" 
+                                    Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBox Text="{Binding Path=Name}"
+                                             Width="{Binding ElementName=gvc_ContainerName, 
+                                                             Path=ActualWidth, 
+                                                             Converter={StaticResource VC_MathOp}, 
+                                                             ConverterParameter=-15}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="IsStatic">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsStatic}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Type">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox ItemsSource="{Binding ElementName=win_Main, 
+                                                                Path=Containers}"
+                                          IsEditable="True"
+                                          DisplayMemberPath="Name"
+                                          Width="{Binding ElementName=gvc_DataName, 
+                                                             Path=ActualWidth, 
+                                                             Converter={StaticResource VC_MathOp}, 
+                                                             ConverterParameter=-15}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <!--#endregion-->
+        <GridSplitter Style="{StaticResource STY_GridSplitter}"
+                      Grid.Row="0"
+                      Grid.RowSpan="2"
+                      Grid.Column="0"/>
+        <!--#region col 2: Data Definition-->
+
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Stretch"
+                    Grid.Row="0"
+                    Grid.Column="1">
+            <Label Content="DataDefinitions"
+                   Style="{StaticResource STY_BasicControl}"
+                   HorizontalAlignment="Stretch"/>
+            <Button Click="btn_AddDataDefinition_Clicked"
+                    Style="{StaticResource STY_AddBtn}"/>
+            <Button Click="btn_RemoveDataDefinition_Clicked"
+                    Style="{StaticResource STY_RemoveBtn}"/>
+        </StackPanel>
+        <ListView x:Name="lstVw_DataDef"
+                  SelectionChanged="lstVw_DataDef_SelectionChanged"
+                  SelectionMode="Extended"
+                  Style="{StaticResource STY_BasicControl}"
+                  Grid.Row="1"
+                  Grid.Column="1">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" 
+                                    x:Name="gvc_DataDefName" 
+                                    Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBox Text="{Binding Path=Name}"
+                                             Width="{Binding ElementName=gvc_DataDefName, 
+                                                             Path=ActualWidth, 
+                                                             Converter={StaticResource VC_MathOp}, 
+                                                             ConverterParameter=-15}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="IsStatic">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsStatic}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!--#endregion-->
+        <GridSplitter Style="{StaticResource STY_GridSplitter}"
+                      Grid.Row="0"
+                      Grid.RowSpan="2"
+                      Grid.Column="1"/>
+        <!--#region col 3: Data-->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Stretch"
+                    Grid.Row="0"
+                    Grid.Column="2">
+            <Label Content="Data"
+                  Style="{StaticResource STY_BasicControl}"
+                   HorizontalAlignment="Stretch"/>
+            <Button Style="{StaticResource STY_AddBtn}"
+                    Click="btn_AddData_Clicked"/>
+            <Button Style="{StaticResource STY_RemoveBtn}"
+                    Click="btn_RemoveData_Clicked"/>
+        </StackPanel>
+        <ListView x:Name="lstVw_Data"
+                  SelectionChanged="lstVw_Data_SelectionChanged"
+                  SelectionMode="Extended"
+                  Style="{StaticResource STY_BasicControl}"
+                  Grid.Row="1"
+                  Grid.Column="2">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name"
+                                    x:Name="gvc_DataName"
+                                    Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBox Text="{Binding Path=Name}"
+                                             Width="{Binding ElementName=gvc_DataName, 
+                                                             Path=ActualWidth, 
+                                                             Converter={StaticResource VC_MathOp}, 
+                                                             ConverterParameter=-15}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="IsStatic">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsStatic}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <!--#endregion-->
+    </Grid>
+</Window>
